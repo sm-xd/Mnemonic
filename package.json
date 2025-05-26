@@ -19,7 +19,9 @@
   },
   "homepage": "https://github.com/sm-xd/Mnemonic#readme",
   "dependencies": {
+    "@types/express": "^5.0.2",
     "express": "^5.1.0",
+    "mongoose": "^8.15.0",
     "typescript": "^5.8.3"
   }
 }
