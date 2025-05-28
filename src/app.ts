@@ -3,6 +3,7 @@ import express, { Application } from 'express';
 import cors from 'cors'
 import routes from './routes';
 import { errorHandler } from './middlewares/error.middleware';
+import { connectDB } from './db';
 
 const app: Application = express();
 
@@ -10,6 +11,8 @@ const app: Application = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+connectDB();
 
 // routes
 app.use('/api', routes);
