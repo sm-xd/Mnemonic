@@ -12,7 +12,7 @@ export const getAllUsers = async () => users;
 
 export async function getUserById(id: string): Promise<User | null> {
   const user = users.find((user) => user.id === id);
-  return user ? user : null;  // explicitly return null if not found
+  return user ? user : null;
 }
 
 
