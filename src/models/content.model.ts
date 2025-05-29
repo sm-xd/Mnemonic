@@ -1,12 +1,12 @@
 import mongoose, { Schema, Types } from "mongoose";
 import User from "./user.model";
-const contentTypes = ['image', 'video', 'article', 'audio']; // Extend as needed
+const contentTypes = ["document", "tweet", "youtube", "link"];
 
 const contentSchema = new Schema({
   link: { type: String, required: true },
   type: { type: String, enum: contentTypes, required: true },
   title: { type: String, required: true },
-  tags: [{ type: Types.ObjectId, ref: 'Tag' }],
+  tags: [{ type: Schema.Types.ObjectId, ref: 'Tag' }],
   userId: { 
     type: Types.ObjectId, 
     ref: 'User', 
