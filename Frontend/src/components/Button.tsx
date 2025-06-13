@@ -1,23 +1,33 @@
-import type { ReactElement } from "react";
+import React from "react";
 
-interface ButtonProps {
-    variant: 'primary' | 'secondary' ;
-    text: string;
-    startIcon?: ReactElement;
+interface ButtonProps{
+  variant: "primary" | "secondary",
+  size: "sm" | "lg",
+  text: String,
+  startIcon?: React.ReactElement,
+  endIcon?: React.ReactElement,
+  onClick?: ()=> void
+} 
+
+const variantStyle = {
+  "primary": "bg-blue-500 text-white hover:bg-blue-600",
+  "secondary": "bg-blue-200 text-blue-600 hover:bg-blue-300"
 }
 
-const variantClasses = {
-    "primary": "bg-purple-700 text-white hover:bg-purple-900",
-    "secondary": "bg-purple-300 text-purple-900 hover:bg-purple-400",
+const variantSize ={
+  "sm": "px-3 py-2",
+  "lg": "px-5 py-2"
 }
-const defaultClasses = "rounded-md focus:outline-none focus:ring-2  px-4 py-2 font-semibold";
 
-export function Button({variant, text, startIcon}: ButtonProps){
-    return <button className={variantClasses[variant] + " " +defaultClasses}>
-        <div className="flex items-center gap-2">
+const defaultStyle = "flex gap-2 rounded-lg text-lg items-center justify-center text-xl"
 
-        {startIcon}
-        {text}
-        </div>
-    </button>
-}
+const Button = (props: ButtonProps) => {
+  return <button  onClick={props.onClick}
+  className={`${variantStyle[props.variant]} ${variantSize[props.size]} ${defaultStyle}`}>
+    {props.startIcon ? props.startIcon : null} 
+    {props.text}
+    {props.endIcon ? props.endIcon: null}
+  </button>
+};
+
+export default Button;
