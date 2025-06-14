@@ -26,49 +26,48 @@ const Home = ()=>{
   async function fetchingData(){
     try{
       setLoading(true);
-      const token = localStorage.getItem("token");
-      if(!token){
+      const token = localStorage.getItem("token");      if(!token){
         alert("Please log in first");
         navigate("/"); 
         return;
-      }
-
-      const res = await fetch("http://localhost:5000/api/v1/content", {
+      }      const res = await fetch("http://localhost:3000/api/content/", {
         method: "GET",
         headers: {
-          "token": token
+          "Authorization": `Bearer ${token}`
         },
         credentials: "include"
       });
 
       const jsonData = await res.json();
-      setData(jsonData.data);
+      console.log(jsonData.content);
+      setData(jsonData.content);
       }catch(err){
         console.log("Error while sending data");
       }finally {
         setLoading(false);
       }
   }
-
   if(dataShow === "All"){
     show = loading ? (
       <div className="text-2xl font-semibold">Loading...</div>
     ) : ( data1.length > 0 ? data1.map((item: any, idx: number)=>{
-      return <Card key={idx} icon={item.contentType} tag={item.tag} title={item.title} link={item.link} reload={()=> setReloadData(!reloadData)}/>
+      const tags = Array.isArray(item.tags) ? item.tags : (item.tags ? [item.tags] : []);
+      return <Card key={idx} icon={item.type} tag={tags} title={item.title} link={item.link} reload={()=> setReloadData(!reloadData)}/>
     }) : <div className="text-2xl font-semibold">You do not have any Content</div>
-    )
-  }else if(dataShow === "Youtube"){
+    )  }else if(dataShow === "Youtube"){
     show = loading ? (
       <div className="text-2xl font-semibold">Loading...</div>
     ) : ( ytData.length > 0 ? ytData.map((item: any, idx: number)=>{
-      return <Card key={idx} icon={item.contentType} tag={item.tag} title={item.title} link={item.link} reload={()=> setReloadData(!reloadData)}/>
+      const tags = Array.isArray(item.tags) ? item.tags : (item.tags ? [item.tags] : []);
+      return <Card key={idx} icon={item.type} tag={tags} title={item.title} link={item.link} reload={()=> setReloadData(!reloadData)}/>
     }) : <div className="text-2xl font-semibold">You do not have any Content</div>
     )
   }else if(dataShow === "Twitter"){
     show = loading ? (
       <div className="text-2xl font-semibold">Loading...</div>
     ) : ( ytData.length > 0 ? ytData.map((item: any, idx: number)=>{
-      return <Card key={idx} icon={item.contentType} tag={item.tag} title={item.title} link={item.link} reload={()=> setReloadData(!reloadData)}/>
+      const tags = Array.isArray(item.tags) ? item.tags : (item.tags ? [item.tags] : []);
+      return <Card key={idx} icon={item.type} tag={tags} title={item.title} link={item.link} reload={()=> setReloadData(!reloadData)}/>
     }) : <div className="text-2xl font-semibold">You do not have any Content</div>
     )
   }
@@ -76,37 +75,32 @@ const Home = ()=>{
     show = loading ? (
       <div className="text-2xl font-semibold">Loading...</div>
     ) : ( notionData.length > 0 ? notionData.map((item: any, idx: number)=>{
-      return <Card key={idx} icon={item.contentType} tag={item.tag} title={item.title} link={item.link} reload={()=> setReloadData(!reloadData)}/>
+      const tags = Array.isArray(item.tags) ? item.tags : (item.tags ? [item.tags] : []);
+      return <Card key={idx} icon={item.type} tag={tags} title={item.title} link={item.link} reload={()=> setReloadData(!reloadData)}/>
     }) : <div className="text-2xl font-semibold">You do not have any Content</div>
     )
   }
-
   async function share(){
     try{
       const token = localStorage.getItem("token");
-      const userId = localStorage.getItem("userId");
 
-      if(!token || !userId){
+      if(!token){
         alert("Please log in first");
         navigate("/"); 
         return;
-      }
-
-      const res = await fetch(`http://localhost:5000/api/v1/content`, {
+      }      const res = await fetch(`http://localhost:3000/api/content/`, {
         method: "GET",
         headers: {
-          "Content-Type": "application/json",
-          "token": token
+          "Authorization": `Bearer ${token}`
         },
         credentials: "include",
       });
       const jsonData = await res.json();
-      setShareData(jsonData.data);
-      //sharing/generating the link
+      setShareData(jsonData.data);      //sharing/generating the link
       if (res.ok) {
         // Encode your data as a query parameter
         const encodedData = encodeURIComponent(JSON.stringify(jsonData.data));
-        const shareLink = `http://localhost:5173/share/${userId}?data=${encodedData}`;
+        const shareLink = `http://localhost:5173/share?data=${encodedData}`;
        
         navigator.clipboard.writeText(shareLink)
         .then(() => {

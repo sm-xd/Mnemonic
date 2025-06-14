@@ -7,14 +7,8 @@ import { useNavigate } from "react-router-dom";
 import TwitterIcon from "../icons/TwitterIcon";
 
 interface CardProps {
-  icon: "Youtube" | "Twitter" | "Notion";
-  tag:
-    | "Productivity"
-    | "Tech & Tools"
-    | "Mindset"
-    | "Learning & Skills"
-    | "Workflows"
-    | "Inspiration";
+  icon: string;
+  tag: string | { name: string }[];
   title: string;
   link: string;
   reload?: () => void;
@@ -43,8 +37,7 @@ const Card = (props: CardProps) => {
 
     return null;
   };
-
-  if (props.icon === "Youtube") {
+  if (props.icon.toLowerCase() === "youtube") {
     contentPreview = (
       <div className="flex justify-center pt-6 items-center">
         {thumbnail ? (
@@ -60,7 +53,7 @@ const Card = (props: CardProps) => {
         )}
       </div>
     );
-  } else if (props.icon === "Twitter") {
+  } else if (props.icon.toLowerCase() === "twitter") {
     contentPreview = (
       <div className="flex justify-center pt-6 items-center">
         <a href={props.link} target="_blank" rel="noopener noreferrer">
@@ -70,7 +63,7 @@ const Card = (props: CardProps) => {
         </a>
       </div>
     );
-  } else if (props.icon === "Notion") {
+  } else if (props.icon.toLowerCase() === "notion") {
     contentPreview = (
       <div className="flex justify-center pt-6 items-center">
         <a href={props.link} target="_blank" rel="noopener noreferrer">
@@ -99,13 +92,13 @@ const Card = (props: CardProps) => {
         navigate("/");
         return;
       }
-
+      console.log(props);
       const res = await fetch(
-        `http://localhost:5000/api/v1/delete/${props.title}`,
+        `http://localhost:3000/api/content/${props.title}`,
         {
-          method: "Delete",
+          method: "DELETE",
           headers: {
-            token: token,
+            Authorization: `Bearer ${token}`,
           },
           credentials: "include",
         }
@@ -134,11 +127,25 @@ const Card = (props: CardProps) => {
           <DeleteIcon />
         </div>
       </div>
-      <div>{contentPreview}</div>
-      <div className="flex gap-3 pt-4 pl-5">
-        <div className="px-3 py-1 text-lg bg-blue-100 rounded-2xl text-blue-500">
-          #{props.tag}
-        </div>
+      <div>{contentPreview}</div>{" "}
+      <div className="flex gap-3 pt-4 pl-5 flex-wrap">
+        {Array.isArray(props.tag) ? (
+          props.tag.map((t, index) => (
+            <div
+              key={index}
+              className="px-3 py-1 text-lg bg-blue-100 rounded-2xl text-blue-500"
+            >
+              #{t.name}
+            </div>
+          ))
+        ) : props.tag ? (
+          <div className="px-3 py-1 text-lg bg-blue-100 rounded-2xl text-blue-500">
+            #
+            {typeof props.tag === "string"
+              ? props.tag
+              : JSON.stringify(props.tag)}
+          </div>
+        ) : null}
       </div>
       <div className="text-sm text-gray-500 pl-5 pt-3 pb-2 absolute fixed bottom-2">
         Created on: <span className="font-medium">{date}</span>

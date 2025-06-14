@@ -5,12 +5,10 @@ const Modal = (props: {onClick: () => void,setModal: (value: boolean) => void, s
 
   const navigate = useNavigate();
 
-  const modalRef = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<HTMLInputElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);  const titleRef = useRef<HTMLInputElement>(null);
   const linkRef = useRef<HTMLInputElement>(null);
-  const [tag, setTag] = useState("Productivity");
+  const tagRef = useRef<HTMLInputElement>(null);
   const [category, setCategory] = useState("Youtube");
-  const mapTags = ["Productivity", "Tech & Tools", "Mindset", "Learning & Skills", "Workflows", "Inspiration"] as const;
 
   const submitData = async() => {
     props.setModal(false);
@@ -20,13 +18,11 @@ const Modal = (props: {onClick: () => void,setModal: (value: boolean) => void, s
     ) {
       alert("Fill all the input fields");
       return;
-    }
-
-    const data = {
+    }    const data = {
+      type: category.toLowerCase(),
       link: linkRef.current?.value || "",
-      contentType: category,
       title: titleRef.current?.value || "",
-      tag,
+      tags: tagRef.current?.value ? tagRef.current.value.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0) : [],
     };
     try{
       const token = localStorage.getItem("token");
@@ -34,13 +30,11 @@ const Modal = (props: {onClick: () => void,setModal: (value: boolean) => void, s
         alert("Please log in first");
         navigate("/"); 
         return;
-      }
-
-      await fetch("http://localhost:5000/api/v1/addcontent", {
+      }      await fetch("http://localhost:3000/api/content/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "token": token
+          "Authorization": `Bearer ${token}`
         },
         credentials: "include",
         body: JSON.stringify(data)
@@ -66,30 +60,21 @@ const Modal = (props: {onClick: () => void,setModal: (value: boolean) => void, s
         <div className="mt-10 mb-3">
           <input ref={titleRef}
           type="text" placeholder="Title"   maxLength={20} className="bg-slate-200 w-[22vw] h-10 rounded-lg p-3 text-black placeholder:text-slate-500 placeholder:text-xl outline-none hover:bg-slate-300"/>
-        </div>
-        <div>
+        </div>        <div>
           <input ref={linkRef}
           type="text" required placeholder="link" className="bg-slate-200 w-[22vw] h-10 rounded-lg p-3 text-black placeholder:text-slate-500 placeholder:text-xl outline-none hover:bg-slate-300"/>
         </div>
-        <div className="mt-5 text-lg font-semibold">
-          Choose Tag:
-        </div>
-        <div className="flex flex-wrap justify-center items-center gap-2 mt-2">
-        {mapTags.map((t) =>
-            tag === t ? (
-              <ModalTag2 key={t} tag={t} onClick={() => setTag(t)}/>
-            ) : (
-              <ModalTag1 key={t} tag={t} onClick={() => setTag(t)}/>
-            )
-        )}
+        <div className="mt-3">
+          <input ref={tagRef}
+          type="text" placeholder="Tags (e.g. productivity, learning)" className="bg-slate-200 w-[22vw] h-10 rounded-lg p-3 text-black placeholder:text-slate-500 placeholder:text-xl outline-none hover:bg-slate-300"/>
         </div>
         <div className="mt-5 text-lg font-semibold">
           Choose Category:
         </div>
         <div className="flex gap-2 mt-2">
-        <button onClick={()=> setCategory("Youtube")}
+        <button onClick={()=> setCategory("youtube")}
         className={`px-2 py-1 text-xl ${category==="Youtube" ? "bg-blue-500 " : "bg-blue-300 "} rounded-lg hover:bg-blue-400`}>Youtube</button>
-        <button onClick={()=> setCategory("Twitter")}
+        <button onClick={()=> setCategory("tweet")}
         className={`px-2 py-1 text-xl ${category==="Twitter" ? "bg-blue-500 " : "bg-blue-300 "} rounded-lg hover:bg-blue-400`}>Twitter</button>
         <button onClick={()=> setCategory("Notion")}
         className={`px-2 py-1 text-xl ${category==="Notion" ? "bg-blue-500 " : "bg-blue-300 "} rounded-lg hover:bg-blue-400`}>Notion</button>
@@ -100,22 +85,5 @@ const Modal = (props: {onClick: () => void,setModal: (value: boolean) => void, s
     </div>
   );
 };
-
-interface CardProps{
-  tag: "Productivity" | "Tech & Tools" | "Mindset" | "Learning & Skills" | "Workflows" | "Inspiration",
-  onClick: ()=> void
-}
-
-const ModalTag1 = (props: CardProps)=>{
-  return <button onClick={props.onClick} className="px-2 py-1 text-xl bg-blue-300 text-blue-600-500 rounded-lg hover:bg-blue-400">
-    {props.tag}
-  </button>
-}
-
-const ModalTag2 = (props: CardProps)=>{
-  return <button onClick={props.onClick} className="px-2 py-1 text-xl bg-blue-500 text-blue-600-500 rounded-lg hover:bg-blue-400">
-    {props.tag}
-  </button>
-}
 
 export default Modal;
